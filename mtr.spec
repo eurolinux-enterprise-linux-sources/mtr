@@ -3,7 +3,7 @@
 Summary: A network diagnostic tool
 Name: mtr
 Version: 0.85
-Release: 4%{?dist}
+Release: 7%{?dist}
 Epoch: 2
 Group: Applications/Internet
 License: GPLv2+
@@ -54,6 +54,8 @@ diagnostic tool.
 export CFLAGS="%{optflags} -fPIE"
 export LDFLAGS="-z now -pie"
 
+autoreconf -fi
+
 %configure --enable-gtk2
 make %{?_smp_mflags} && mv mtr xmtr.bin && make distclean
 %configure --without-gtk
@@ -93,6 +95,15 @@ desktop-file-install \
 %endif
 
 %changelog
+* Fri Jan 24 2014 Daniel Mach <dmach@redhat.com> - 2:0.85-7
+- Mass rebuild 2014-01-24
+
+* Tue Jan 07 2014 Michal Sekletar <msekleta@redhat.com> - 2:0.85-6
+- call autoreconf before building the package (#1048885)
+
+* Fri Dec 27 2013 Daniel Mach <dmach@redhat.com> - 2:0.85-5
+- Mass rebuild 2013-12-27
+
 * Fri Oct 18 2013 Michal Sekletar <msekleta@redhat.com> - 2:0.85-4
 - rebuild with new upstream tarball for release 0.85 (#1020927)
 
