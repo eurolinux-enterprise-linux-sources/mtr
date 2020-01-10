@@ -1,0 +1,45 @@
+From a646775da81a6a80c25b8bc5b26c465786ddfa38 Mon Sep 17 00:00:00 2001
+From: Roger Wolff <R.E.Wolff@BitWizard.nl>
+Date: Wed, 3 Jul 2013 12:00:28 +0200
+Subject: [PATCH 1/4] fixed default hostname
+
+---
+ mtr.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
+
+diff --git a/mtr.c b/mtr.c
+index 75a3b06..fd4705d 100644
+--- a/mtr.c
++++ b/mtr.c
+@@ -141,7 +141,8 @@ append_to_names(const char* progname, const char* item) {
+     fprintf(stderr, "%s: memory allocation failure\n", progname);
+     exit(EXIT_FAILURE);
+   }
+-  name->name = strdup(item);
++  // prepared for adding NULL name, but decided against that in the end.
++  name->name = item?strdup(item):item;
+   name->next = names;
+   names = name;
+ }
+@@ -581,13 +582,16 @@ int main(int argc, char **argv)
+   }
+ 
+   time_t now = time(NULL);
++
++  if (!names) append_to_names (argv[0], "localhost"); // default: localhost. 
++
+   names_t* head = names;
+   while (names != NULL) {
+ 
+     Hostname = names->name;
+-    if (Hostname == NULL) Hostname = "localhost";
++    //  if (Hostname == NULL) Hostname = "localhost"; // no longer necessary.
+     if (gethostname(LocalHostname, sizeof(LocalHostname))) {
+-    strcpy(LocalHostname, "UNKNOWNHOST");
++      strcpy(LocalHostname, "UNKNOWNHOST");
+     }
+ 
+     if (net_preopen_result != 0) {
+-- 
+1.8.3.1
+

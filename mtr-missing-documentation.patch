@@ -1,0 +1,141 @@
+diff -up mtr-0.85/mtr.8.docs mtr-0.85/mtr.8
+--- mtr-0.85/mtr.8.docs	2013-04-29 20:22:05.000000000 +0200
++++ mtr-0.85/mtr.8	2013-10-04 15:26:58.852865628 +0200
+@@ -8,7 +8,7 @@ mtr \- a network diagnostic tool
+ .SH SYNOPSIS
+ .B mtr 
+ [\c
+-.B \-hvrctglspeniuTP46\c
++.B \-BfhvrctglxspQemniuTP46\c
+ ]
+ [\c
+ .B \-\-help\c
+@@ -34,6 +34,9 @@ mtr \- a network diagnostic tool
+ [\c
+ .B \-\-raw\c
+ ]
++[
++.B \-\-xml\c
++]
+ [\c
+ .B \-\-mpls\c
+ ]
+@@ -53,12 +56,27 @@ mtr \- a network diagnostic tool
+ .B \-\-interval\ SECONDS\c
+ ]
+ [\c
++.B \-\-max-ttl\ NUM\c
++]
++[\c
++.B \-\-first-ttl\ NUM\c
++]
++[\c
++.B \-\-bitpattern\ NUM\c
++]
++[\c
++.B \-\-tos\ NUM\c
++]
++[\c
+ .B \-\-psize\ BYTES | -s BYTES\c
+ ]
+ [\c
+ .B \-\-tcp\c
+ ]
+ [\c
++.B \-\-udp\c
++]
++[\c
+ .B \-\-port\ PORT\c
+ ]
+ [\c
+@@ -270,13 +288,23 @@ to spit out a format that is suitable fo
+ .TP
+ .B \-\-raw
+ .br
+-Use this option to tell 
+-.B mtr 
++Use this option to tell
++.B mtr
+ to use the raw output format. This format is better suited for
+ archival of the measurement results. It could be parsed to 
+ be presented into any of the other display methods. 
+ 
+ .TP
++.B \-x
++.TP
++.B \-\-xml
++.br
++Use this option to tell
++.B mtr
++to use the xml output format. This format is better suited for
++automated processing of the measurement results.
++
++.TP
+ .B \-a\ IP.ADD.RE.SS
+ .TP
+ .B \-\-address\ IP.ADD.RE.SS
+@@ -295,7 +323,39 @@ Use this option to specify the positive
+ ECHO requests.  The default value for this parameter is one second.
+ 
+ .TP
++.B \-m\ NUM
++.TP
++.B \-\-max-ttl\ NUM
++.br
++Specifies the maximum number of hops (max time-to-live value) traceroute will
++probe. Default is 30.
++
++.TP
++.B \-f\ NUM
++.TP
++.B \-\-first-ttl\ NUM
++.br
++Specifies with what TTL to start. Defaults to 1.
++
++.TP
++.B \-B\ NUM
++.TP
++.B \-\-bitpattern\ NUM
++.br
++Specifies bit pattern to use in payload. Should be within range 0 - 255.
++
++.TP
++.B \-Q\ NUM
++.TP
++.B \-\-tos\ NUM
++.br
++Specifies value for type of service field in IP header. Should be within range 0
++- 255.
++
++.TP
+ .B \-u
++.TP
++.B \-\-udp
+ .br
+ Use UDP datagrams instead of ICMP ECHO.
+ 
+diff -up mtr-0.85/mtr.c.docs mtr-0.85/mtr.c
+--- mtr-0.85/mtr.c.docs	2013-10-04 15:26:58.852865628 +0200
++++ mtr-0.85/mtr.c	2013-10-04 15:30:42.934859098 +0200
+@@ -567,16 +567,17 @@ int main(int argc, char **argv)
+   }
+ 
+   if (PrintHelp) {
+-    printf("usage: %s [-hvrwctglspniuT46] [--help] [--version] [--report]\n"
++    printf("usage: %s [-BfhvrwctglxspQomniuT46] [--help] [--version] [--report]\n"
+ 	   "\t\t[--report-wide] [--report-cycles=COUNT] [--curses] [--gtk]\n"
+-           "\t\t[--csv|-C] [--raw] [--split] [--mpls] [--no-dns] [--show-ips]\n"
++           "\t\t[--csv|-C] [--raw] [--xml] [--split] [--mpls] [--no-dns] [--show-ips]\n"
+            "\t\t[--address interface] [--filename=FILE|-F]\n" /* BL */
+ #ifndef NO_IPINFO
+            "\t\t[--ipinfo=item_no|-y item_no]\n"
+            "\t\t[--aslookup|-z]\n"
+ #endif
+-           "\t\t[--psize=bytes/-s bytes]\n"            /* ok */
+-           "\t\t[--report-wide|-w] [-u|-T] [--port=PORT] [--timeout=SECONDS]\n"            /* rew */
++           "\t\t[--psize=bytes/-s bytes] [--order fields]\n"            /* ok */
++           "\t\t[--report-wide|-w] [--inet] [--inet6] [--max-ttl=NUM] [--first-ttl=NUM]\n"
++           "\t\t[--bitpattern=NUM] [--tos=NUM] [--udp] [--tcp] [--port=PORT] [--timeout=SECONDS]\n"   /* rew */
+ 	   "\t\t[--interval=SECONDS] HOSTNAME\n", argv[0]);
+     exit(0);
+   }
