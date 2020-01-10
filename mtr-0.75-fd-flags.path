@@ -1,0 +1,14 @@
+diff -up mtr-0.75/net.c.fd-flags mtr-0.75/net.c
+--- mtr-0.75/net.c.fd-flags	2008-10-22 08:07:53.000000000 +0200
++++ mtr-0.75/net.c	2008-10-23 13:57:04.000000000 +0200
+@@ -945,8 +945,9 @@ int net_preopen(void) 
+   set_fd_flags(recvsock4);
+ #ifdef ENABLE_IPV6
+   recvsock6 = socket(AF_INET6, SOCK_RAW, IPPROTO_ICMPV6);
++  if (recvsock6 >= 0)
++    set_fd_flags(recvsock6);  
+ #endif
+-  set_fd_flags(recvsock6);
+ 
+   return 0;
+ }
